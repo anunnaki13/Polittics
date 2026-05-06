@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>ARENA POLITIKA — Live Debate</title>
+<meta name="viewport" content="width=1440" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050816;
+    --text:#e6ecff;
+    --muted:#7d8aad;
+    --dim:#566083;
+    --cyan:#00d9ff;
+    --cyan-soft:rgba(0,217,255,0.18);
+    --magenta:#ff4477;
+    --magenta-soft:rgba(255,68,119,0.18);
+    --gold:#d4af37;
+    --green:#00ff88;
+    --red:#ff4d6d;
+    --yellow:#ffc24d;
+    --line:rgba(120,170,255,0.12);
+    --line-2:rgba(120,170,255,0.22);
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'Inter', system-ui, sans-serif;
+    --serif:'Fraunces', serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#020410;color:var(--text);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(60% 50% at 18% 35%, rgba(0,217,255,0.18), transparent 70%),
+      radial-gradient(60% 50% at 82% 35%, rgba(255,68,119,0.18), transparent 70%),
+      radial-gradient(45% 55% at 50% 90%, rgba(212,175,55,0.06), transparent 70%),
+      linear-gradient(180deg, #050816 0%, #02040c 100%);
+    position:relative;
+  }
+  /* Faint grid */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(120,170,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,170,255,0.05) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(ellipse 70% 60% at center, black 30%, transparent 85%);
+  }
+  /* Vignette */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 95% 80% at 50% 50%, transparent 55%, rgba(0,0,0,0.65) 100%);
+  }
+  /* Scanline */
+  .scan{position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+    mix-blend-mode:overlay}
+
+  .shell{width:1440px;margin:0 auto;position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column}
+
+  /* Particle layer */
+  .particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+  .particles i{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(0,217,255,.6);box-shadow:0 0 6px rgba(0,217,255,.8);animation:float 14s linear infinite}
+  .particles i:nth-child(odd){background:rgba(255,68,119,.6);box-shadow:0 0 6px rgba(255,68,119,.8)}
+  @keyframes float{
+    0%{transform:translateY(0) translateX(0);opacity:0}
+    10%{opacity:.7}
+    90%{opacity:.5}
+    100%{transform:translateY(-120vh) translateX(20px);opacity:0}
+  }
+
+  /* TOP BANNER */
+  .banner{
+    height:64px;display:flex;align-items:center;padding:0 28px;gap:22px;position:relative;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(8,12,30,0.65), rgba(5,8,22,0.2));
+    backdrop-filter:blur(6px);
+    z-index:5;
+  }
+  .live{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:0.3em;color:var(--red);text-transform:uppercase}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:pulse 1.1s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+  .topic{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .topic .eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:0.4em;color:var(--dim);text-transform:uppercase}
+  .topic h1{
+    font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:0.01em;
+    background:linear-gradient(180deg,#ffffff 0%,#bcd1ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 18px rgba(120,170,255,0.15);
+  }
+  .topic h1 em{font-style:italic;color:var(--gold);-webkit-text-fill-color:var(--gold)}
+
+  .round{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:11px;letter-spacing:0.18em}
+  .round .pip{display:flex;gap:6px;align-items:center}
+  .round .pip i{width:10px;height:10px;border:1px solid var(--line-2);background:transparent;display:inline-block;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+  .round .pip i.done{background:var(--cyan);box-shadow:0 0 8px var(--cyan);border-color:var(--cyan)}
+  .round .pip i.cur{background:var(--gold);box-shadow:0 0 12px var(--gold);border-color:var(--gold)}
+  .round .id{padding:6px 10px;border:1px solid var(--line);font-size:10.5px;color:var(--muted);letter-spacing:0.18em;background:rgba(255,255,255,.02)}
+
+  /* MAIN STAGE */
+  .stage{
+    flex:1;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;
+    padding:24px 28px 20px;position:relative;min-height:520px;
+  }
+
+  /* connecting beam under timer */
+  .stage::before{
+    content:"";position:absolute;left:6%;right:6%;top:50%;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(0,217,255,.35) 18%, rgba(0,217,255,.6) 35%, rgba(212,175,55,.7) 50%, rgba(255,68,119,.6) 65%, rgba(255,68,119,.35) 82%, transparent);
+    box-shadow:0 0 14px rgba(120,170,255,.25);
+    transform:translateY(-50%);
+    z-index:0;
+  }
+
+  /* Player frame (left) and AI frame (right) share base */
+  .fighter{
+    position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;
+    padding:18px 22px;
+  }
+
+  .frame{
+    --c:var(--cyan);
+    position:relative;width:280px;height:340px;
+    border:1px solid var(--c);
+    background:
+      linear-gradient(180deg, rgba(0,217,255,0.06), rgba(0,217,255,0.02) 60%, transparent),
+      radial-gradient(circle at 50% 35%, rgba(0,217,255,0.18), transparent 70%);
+    box-shadow:0 0 50px rgba(0,217,255,0.18), inset 0 0 60px rgba(0,217,255,0.08);
+    overflow:hidden;
+  }
+  .frame.opp{
+    --c:var(--magenta);
+    background:
+      linear-gradient(180deg, rgba(255,68,119,0.06), rgba(255,68,119,0.02) 60%, transparent),
+      radial-gradient(circle at 50% 35%, rgba(255,68,119,0.18), transparent 70%);
+    box-shadow:0 0 50px rgba(255,68,119,0.18), inset 0 0 60px rgba(255,68,119,0.08);
+  }
+  /* Cinematic corner cuts */
+  .frame{clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)}
+
+  /* corner ticks */
+  .tick{position:absolute;width:14px;height:14px;border:1px solid var(--c);opacity:.85}
+  .tick.tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .tick.tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+  .tick.bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+  .tick.br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+  /* avatar */
+  .avatar{
+    position:absolute;top:24px;left:50%;transform:translateX(-50%);
+    width:170px;height:200px;display:flex;align-items:center;justify-content:center;
+  }
+  .avatar svg{width:100%;height:100%;filter:drop-shadow(0 0 18px rgba(0,217,255,.5))}
+  .opp .avatar svg{filter:drop-shadow(0 0 18px rgba(255,68,119,.5))}
+
+  /* Frame footer info */
+  .info{
+    position:absolute;left:0;right:0;bottom:0;padding:14px 16px 16px;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.55) 60%);
+    text-align:center;
+  }
+  .info .role{font-family:var(--mono);font-size:9.5px;letter-spacing:0.35em;color:var(--muted);text-transform:uppercase}
+  .info .name{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:0.18em;margin-top:4px;color:#fff}
+  .info .sub{font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:0.05em}
+
+  /* Position badge */
+  .pos-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 18px;font-family:var(--mono);font-size:11px;letter-spacing:0.35em;
+    border:1px solid;
+    text-transform:uppercase;
+    position:relative;
+  }
+  .pos-badge.pro{color:var(--green);border-color:rgba(0,255,136,.5);background:rgba(0,255,136,.06);box-shadow:0 0 22px rgba(0,255,136,.25), inset 0 0 12px rgba(0,255,136,.1)}
+  .pos-badge.kontra{color:var(--red);border-color:rgba(255,77,109,.55);background:rgba(255,77,109,.07);box-shadow:0 0 22px rgba(255,77,109,.25), inset 0 0 12px rgba(255,77,109,.1)}
+  .pos-badge::before, .pos-badge::after{content:"";width:6px;height:6px;background:currentColor;clip-path:polygon(0 0,100% 50%,0 100%)}
+  .pos-badge::after{transform:scaleX(-1)}
+
+  /* Mic / waveform row */
+  .mic-row{
+    display:flex;align-items:center;gap:12px;
+    padding:9px 14px;border:1px solid var(--line-2);
+    background:rgba(255,255,255,0.03);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;
+    text-transform:uppercase;
+    width:280px;justify-content:space-between;
+  }
+  .mic-row.opp{border-color:rgba(255,68,119,.3)}
+  .mic-row .label{display:flex;align-items:center;gap:8px;color:var(--cyan)}
+  .mic-row.opp .label{color:var(--magenta)}
+  .mic-row .label svg{width:13px;height:13px}
+  .mic-row .label .live-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1s infinite}
+  .mic-row.opp .label .live-dot{background:var(--magenta);box-shadow:0 0 8px var(--magenta);animation-duration:1.6s;opacity:.55}
+
+  .wave{display:flex;align-items:center;gap:2px;height:18px}
+  .wave i{width:2px;background:var(--cyan);box-shadow:0 0 4px var(--cyan);border-radius:1px;height:4px}
+  .wave.opp i{background:var(--magenta);box-shadow:0 0 4px var(--magenta);opacity:.5}
+
+  /* CENTER TIMER */
+  .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;position:relative;z-index:3}
+  .timer{
+    position:relative;width:200px;height:200px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .timer svg{position:absolute;inset:0;transform:rotate(-90deg)}
+  .timer .center{position:relative;text-align:center;font-family:var(--mono)}
+  .timer .center .t{font-size:48px;font-weight:500;letter-spacing:0.04em;color:#fff;text-shadow:0 0 22px rgba(212,175,55,.55), 0 0 6px rgba(255,255,255,.3);line-height:1}
+  .timer .center .lbl{font-size:9px;letter-spacing:0.4em;color:var(--muted);margin-top:6px;text-transform:uppercase}
+
+  .turn-indicator{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.4em;color:var(--gold);
+    padding:8px 18px;border:1px solid rgba(212,175,55,.5);
+    background:rgba(212,175,55,.06);
+    text-transform:uppercase;
+    box-shadow:0 0 22px rgba(212,175,55,.18);
+    position:relative;
+  }
+  .turn-indicator::before{
+    content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%) rotate(45deg);
+    width:8px;height:8px;border-left:1px solid rgba(212,175,55,.5);border-bottom:1px solid rgba(212,175,55,.5);background:rgba(212,175,55,.06)
+  }
+  .turn-indicator::after{
+    content:"";position:absolute;right:-8px;top:50%;transform:translateY(-50%) rotate(45deg);
+    width:8px;height:8px;border-right:1px solid rgba(212,175,55,.5);border-top:1px solid rgba(212,175,55,.5);background:rgba(212,175,55,.06)
+  }
+
+  .round-progress{display:flex;gap:10px;align-items:center;font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:0.2em}
+
+  /* BOTTOM PANEL */
+  .bottom{
+    padding:0 28px 22px;display:grid;grid-template-columns:1.45fr 1fr;gap:18px;position:relative;z-index:4;
+  }
+
+  /* Transcript */
+  .transcript{
+    position:relative;padding:18px 22px 18px 26px;
+    border:1px solid var(--line);
+    border-left:3px solid var(--cyan);
+    background:linear-gradient(180deg, rgba(0,217,255,0.05), rgba(0,217,255,0.01));
+    min-height:172px;
+    box-shadow:0 0 30px rgba(0,217,255,0.06);
+  }
+  .transcript::before{
+    content:"";position:absolute;top:14px;left:-2px;width:3px;height:24px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);
+  }
+  .transcript .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .transcript .head .l{font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+  .transcript .head .l .live-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1s infinite}
+  .transcript .head .r{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:0.18em}
+  .transcript .head .r b{color:var(--green)}
+
+  .transcript .quote{
+    font-family:var(--mono);font-size:14px;line-height:1.65;color:#dde6ff;letter-spacing:0.01em;
+  }
+  .transcript .quote .strong{color:#fff;background:linear-gradient(180deg, transparent 60%, rgba(0,217,255,.18) 60%);padding:0 2px}
+  .transcript .quote .num{color:var(--gold);font-weight:600}
+  .cursor{display:inline-block;width:9px;height:16px;background:var(--cyan);box-shadow:0 0 8px var(--cyan);vertical-align:-3px;animation:blink 1s steps(2) infinite;margin-left:4px}
+  @keyframes blink{50%{opacity:0}}
+
+  .transcript .tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .tag{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;padding:4px 8px;border:1px solid var(--line-2);color:var(--muted);text-transform:uppercase}
+  .tag.good{color:var(--green);border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.05)}
+  .tag.warn{color:var(--yellow);border-color:rgba(255,194,77,.4);background:rgba(255,194,77,.05)}
+
+  /* Metrics */
+  .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .metric{
+    position:relative;padding:11px 10px;
+    border:1px solid var(--line-2);background:rgba(255,255,255,0.025);
+    text-align:left;
+    font-family:var(--mono);
+    overflow:hidden;
+  }
+  .metric.good{border-color:rgba(0,255,136,.4);box-shadow:inset 0 0 16px rgba(0,255,136,.06)}
+  .metric.warn{border-color:rgba(255,194,77,.4);box-shadow:inset 0 0 16px rgba(255,194,77,.06)}
+  .metric .lbl{font-size:8.5px;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase}
+  .metric .val{font-size:24px;font-weight:600;letter-spacing:0.04em;color:#fff;margin-top:4px;line-height:1}
+  .metric.good .val{color:#aaffd1;text-shadow:0 0 12px rgba(0,255,136,.4)}
+  .metric.warn .val{color:#ffe2a3;text-shadow:0 0 12px rgba(255,194,77,.4)}
+  .metric .val small{font-size:11px;color:var(--muted);font-weight:400;margin-left:2px}
+  .metric .bar{height:3px;background:rgba(255,255,255,0.06);margin-top:8px;position:relative;overflow:hidden}
+  .metric .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .metric.warn .bar i{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
+  .metric .delta{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:0.1em;color:var(--green)}
+  .metric.warn .delta{color:var(--yellow)}
+  .metric.warn.down .delta{color:var(--magenta)}
+
+  /* ACTION BAR */
+  .actions{
+    border-top:1px solid var(--line);
+    padding:16px 28px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:linear-gradient(180deg, rgba(5,8,22,0.4), rgba(5,8,22,0.95));
+    backdrop-filter:blur(8px);
+    position:relative;z-index:5;
+  }
+  .actions .left, .actions .right{display:flex;gap:12px;align-items:center}
+  .btn{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+    padding:13px 22px;border:1px solid;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+    transition:all .15s;background:transparent;color:var(--muted);border-color:var(--line-2);
+  }
+  .btn:hover{color:var(--text);border-color:var(--cyan)}
+  .btn svg{width:14px;height:14px}
+  .btn.primary{
+    color:#eafcff;
+    border-color:var(--cyan);
+    background:linear-gradient(180deg, rgba(0,217,255,.28), rgba(0,217,255,.1));
+    box-shadow:0 0 28px rgba(0,217,255,.45), inset 0 0 18px rgba(0,217,255,.18);
+    padding:14px 34px;font-size:12px;letter-spacing:0.3em;
+    position:relative;
+  }
+  .btn.primary::before{
+    content:"";position:absolute;inset:-3px;border:1px solid rgba(0,217,255,.35);pointer-events:none;
+    animation:pulseRing 2.4s infinite;
+  }
+  @keyframes pulseRing{0%,100%{opacity:.4}50%{opacity:1;box-shadow:0 0 16px rgba(0,217,255,.4)}}
+  .btn.primary:hover{box-shadow:0 0 36px rgba(0,217,255,.6)}
+  .btn.danger{color:var(--magenta);border-color:rgba(255,68,119,.5);background:rgba(255,68,119,.04)}
+  .btn.danger:hover{background:rgba(255,68,119,.12);box-shadow:0 0 18px rgba(255,68,119,.3)}
+  .btn.ghost{color:var(--dim)}
+
+  .actions .ctx{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;color:var(--dim);text-transform:uppercase}
+  .actions .ctx b{color:var(--gold)}
+  .kbd{font-family:var(--mono);font-size:9px;padding:2px 6px;border:1px solid var(--line);color:var(--dim);margin-left:6px}
+
+  /* HUD strips on left/right edges */
+  .edge{position:absolute;top:80px;bottom:80px;width:38px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:0.3em;color:var(--dim);writing-mode:vertical-rl;transform:rotate(180deg);pointer-events:none;z-index:3}
+  .edge.l{left:6px}
+  .edge.r{right:6px;color:var(--magenta);opacity:.6}
+  .edge.l{color:var(--cyan);opacity:.6}
+
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="shell">
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- BANNER -->
+  <header class="banner">
+    <div class="live"><span class="dot"></span>LIVE · ON AIR</div>
+    <div class="topic">
+      <div class="eyebrow">MOSI · RONDE 2 dari 3 · DEBAT OXFORD</div>
+      <h1>"Subsidi BBM <em>Harus Dicabut Total</em>"</h1>
+    </div>
+    <div class="round">
+      <div class="pip"><i class="done"></i><i class="cur"></i><i></i></div>
+      <div class="id">[ AP-2840-X ]</div>
+    </div>
+  </header>
+
+  <!-- Edge HUD -->
+  <div class="edge l">CH·01 PLAYER FEED · WHISPER-V3 · VOICE LIVE</div>
+  <div class="edge r">CH·02 OPPONENT FEED · GEMINI-2.5 · MODE INTELEKTUAL</div>
+
+  <!-- STAGE -->
+  <main class="stage">
+
+    <!-- LEFT: PLAYER -->
+    <div class="fighter">
+      <div class="frame">
+        <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
+        <div class="avatar">
+          <!-- Original geometric avatar — stylized faceted bust -->
+          <svg viewBox="0 0 170 200" fill="none">
+            <defs>
+              <linearGradient id="pl-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3ee5ff"/>
+                <stop offset="100%" stop-color="#0a3a78"/>
+              </linearGradient>
+              <linearGradient id="pl-grad2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00d9ff"/>
+                <stop offset="100%" stop-color="#1d2a5e"/>
+              </linearGradient>
+            </defs>
+            <!-- Halo ring -->
+            <circle cx="85" cy="78" r="60" stroke="rgba(0,217,255,.35)" stroke-width="1" stroke-dasharray="2 4"/>
+            <circle cx="85" cy="78" r="48" stroke="rgba(0,217,255,.15)" stroke-width="1"/>
+            <!-- Head (faceted) -->
+            <polygon points="85,30 115,42 122,78 110,112 85,124 60,112 48,78 55,42" fill="url(#pl-grad)" stroke="#00d9ff" stroke-width="1.2"/>
+            <!-- Inner face plate -->
+            <polygon points="85,46 105,55 110,82 96,104 85,108 74,104 60,82 65,55" fill="url(#pl-grad2)" opacity=".7" stroke="#00d9ff" stroke-width=".6"/>
+            <!-- Eye visor -->
+            <rect x="65" y="72" width="40" height="6" fill="#00d9ff" opacity=".9"/>
+            <line x1="65" y1="75" x2="105" y2="75" stroke="#fff" stroke-width=".6"/>
+            <!-- Shoulders / body -->
+            <polygon points="40,200 60,140 110,140 130,200" fill="url(#pl-grad)" opacity=".7" stroke="#00d9ff" stroke-width="1"/>
+            <polygon points="60,140 85,124 110,140 105,170 65,170" fill="#0a1230" stroke="#00d9ff" stroke-width=".8"/>
+            <!-- Glow lines -->
+            <line x1="20" y1="180" x2="55" y2="155" stroke="#00d9ff" stroke-width=".6" opacity=".5"/>
+            <line x1="150" y1="180" x2="115" y2="155" stroke="#00d9ff" stroke-width=".6" opacity=".5"/>
+            <!-- ID tag -->
+            <text x="85" y="194" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="#00d9ff" letter-spacing="2">OP·2840·BUDI</text>
+          </svg>
+        </div>
+        <div class="info">
+          <div class="role">PLAYER · CHANNEL 01</div>
+          <div class="name">ANDA</div>
+          <div class="sub">Budi_PKU · ELO 1247 · The New Voice</div>
+        </div>
+      </div>
+      <div class="pos-badge pro">PRO</div>
+      <div class="mic-row">
+        <span class="label"><span class="live-dot"></span>MIC AKTIF</span>
+        <div class="wave" id="waveMe"></div>
+      </div>
+    </div>
+
+    <!-- CENTER: TIMER -->
+    <div class="timer-wrap">
+      <div class="round-progress">RONDE · 02 / 03</div>
+      <div class="timer">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#00d9ff"/>
+              <stop offset="50%" stop-color="#d4af37"/>
+              <stop offset="100%" stop-color="#ff4477"/>
+            </linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+          </defs>
+          <!-- Outer dashed ring -->
+          <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(120,170,255,.18)" stroke-width="1" stroke-dasharray="2 5"/>
+          <!-- Track -->
+          <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(212,175,55,.12)" stroke-width="6"/>
+          <!-- Progress: 45/60 of round = 75% remaining -->
+          <circle cx="100" cy="100" r="82" fill="none" stroke="url(#ring)" stroke-width="6"
+                  stroke-dasharray="515.2" stroke-dashoffset="128.8" stroke-linecap="round"
+                  style="filter:drop-shadow(0 0 8px rgba(212,175,55,.55))"/>
+          <!-- tick marks -->
+          <g stroke="rgba(212,175,55,.5)" stroke-width="1">
+            <line x1="100" y1="6" x2="100" y2="14"/>
+            <line x1="100" y1="186" x2="100" y2="194"/>
+            <line x1="6" y1="100" x2="14" y2="100"/>
+            <line x1="186" y1="100" x2="194" y2="100"/>
+          </g>
+          <!-- end dot -->
+          <circle cx="100" cy="18" r="4" fill="#d4af37" style="filter:drop-shadow(0 0 6px #d4af37)"/>
+        </svg>
+        <div class="center">
+          <div class="t">0:45</div>
+          <div class="lbl">Waktu Tersisa</div>
+        </div>
+      </div>
+      <div class="turn-indicator">▸ GILIRAN ANDA ◂</div>
+    </div>
+
+    <!-- RIGHT: AI OPPONENT -->
+    <div class="fighter">
+      <div class="frame opp">
+        <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
+        <div class="avatar">
+          <!-- AI / robot bust, geometric -->
+          <svg viewBox="0 0 170 200" fill="none">
+            <defs>
+              <linearGradient id="op-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff7aa3"/>
+                <stop offset="100%" stop-color="#5a0e2a"/>
+              </linearGradient>
+              <linearGradient id="op-grad2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff4477"/>
+                <stop offset="100%" stop-color="#2a0a18"/>
+              </linearGradient>
+            </defs>
+            <circle cx="85" cy="78" r="60" stroke="rgba(255,68,119,.35)" stroke-width="1" stroke-dasharray="2 4"/>
+            <circle cx="85" cy="78" r="48" stroke="rgba(255,68,119,.15)" stroke-width="1"/>
+            <!-- AI head: hexagonal helmet -->
+            <polygon points="85,28 120,46 120,90 85,118 50,90 50,46" fill="url(#op-grad)" stroke="#ff4477" stroke-width="1.2"/>
+            <!-- inner plate -->
+            <polygon points="85,42 108,54 108,86 85,104 62,86 62,54" fill="url(#op-grad2)" opacity=".75" stroke="#ff4477" stroke-width=".6"/>
+            <!-- antenna -->
+            <line x1="85" y1="20" x2="85" y2="28" stroke="#ff4477" stroke-width="1.2"/>
+            <circle cx="85" cy="16" r="3" fill="#ff4477" style="filter:drop-shadow(0 0 5px #ff4477)"/>
+            <!-- side bolts -->
+            <circle cx="50" cy="68" r="2.5" fill="#ff4477"/><circle cx="120" cy="68" r="2.5" fill="#ff4477"/>
+            <!-- Eye line: two LEDs -->
+            <rect x="68" y="68" width="34" height="8" rx="1" fill="#1a0410" stroke="#ff4477" stroke-width=".6"/>
+            <circle cx="76" cy="72" r="2.4" fill="#ff4477" style="filter:drop-shadow(0 0 5px #ff4477)"/>
+            <circle cx="94" cy="72" r="2.4" fill="#ff4477" style="filter:drop-shadow(0 0 5px #ff4477)"/>
+            <!-- mouth grille -->
+            <g stroke="#ff4477" stroke-width=".8" opacity=".75">
+              <line x1="74" y1="92" x2="96" y2="92"/>
+              <line x1="76" y1="96" x2="94" y2="96"/>
+              <line x1="78" y1="100" x2="92" y2="100"/>
+            </g>
+            <!-- jaw -->
+            <polygon points="68,108 102,108 96,124 74,124" fill="#1a0410" stroke="#ff4477" stroke-width=".8"/>
+            <!-- shoulders -->
+            <polygon points="40,200 58,140 112,140 130,200" fill="url(#op-grad)" opacity=".7" stroke="#ff4477" stroke-width="1"/>
+            <polygon points="58,140 85,128 112,140 108,170 62,170" fill="#1a0410" stroke="#ff4477" stroke-width=".8"/>
+            <!-- chest core -->
+            <circle cx="85" cy="156" r="6" fill="none" stroke="#ff4477" stroke-width="1"/>
+            <circle cx="85" cy="156" r="2.5" fill="#ff4477" style="filter:drop-shadow(0 0 5px #ff4477)"/>
+            <text x="85" y="194" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="#ff4477" letter-spacing="2">AI·PROF·v2.5</text>
+          </svg>
+        </div>
+        <div class="info">
+          <div class="role">AI OPPONENT · CHANNEL 02</div>
+          <div class="name">SI PROFESOR</div>
+          <div class="sub">intelektual · data-driven · level 7</div>
+        </div>
+      </div>
+      <div class="pos-badge kontra">KONTRA</div>
+      <div class="mic-row opp">
+        <span class="label"><span class="live-dot"></span>MENDENGAR</span>
+        <div class="wave opp" id="waveOpp"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM: TRANSCRIPT + METRICS -->
+  <section class="bottom">
+    <div class="transcript">
+      <div class="head">
+        <div class="l"><span class="live-dot"></span>TRANSKRIP LIVE · ANDA</div>
+        <div class="r">WHISPER-V3 · AKURASI <b>99.2%</b> · ID-LATIN</div>
+      </div>
+      <div class="quote" id="quote">
+        "Justru karena beban anggaran terus membengkak, subsidi harus <span class="strong">tepat sasaran</span>. Data BPS <span class="num">2025</span> menunjukkan <span class="num">70%</span> subsidi BBM dinikmati kelas menengah-atas, sementara hanya <span class="num">3%</span> mencapai keluarga miskin di pedesaan. Maka argumen saya<span class="cursor"></span>
+      </div>
+      <div class="tags">
+        <span class="tag good">▲ FAKTA TERVERIFIKASI</span>
+        <span class="tag good">SUMBER · BPS 2025</span>
+        <span class="tag warn">EMOSI MENURUN</span>
+        <span class="tag">42 KATA · 18 DETIK</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:var(--mono);font-size:9.5px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between">
+        <span>METRIK · AI JUDGE</span>
+        <span style="color:var(--gold)">SKOR · 8.1/10</span>
+      </div>
+      <div class="metrics">
+        <div class="metric good">
+          <div class="lbl">Logika</div>
+          <div class="val">9.0<small>/10</small></div>
+          <div class="bar"><i style="width:90%"></i></div>
+          <div class="delta">+0.4</div>
+        </div>
+        <div class="metric good">
+          <div class="lbl">Data</div>
+          <div class="val">8.5<small>/10</small></div>
+          <div class="bar"><i style="width:85%"></i></div>
+          <div class="delta">+0.7</div>
+        </div>
+        <div class="metric warn down">
+          <div class="lbl">Emosi</div>
+          <div class="val">6.1<small>/10</small></div>
+          <div class="bar"><i style="width:61%"></i></div>
+          <div class="delta">−0.3</div>
+        </div>
+        <div class="metric good">
+          <div class="lbl">Konsistensi</div>
+          <div class="val">8.8<small>/10</small></div>
+          <div class="bar"><i style="width:88%"></i></div>
+          <div class="delta">+0.1</div>
+        </div>
+        <div class="metric warn">
+          <div class="lbl">Retorika</div>
+          <div class="val">7.2<small>/10</small></div>
+          <div class="bar"><i style="width:72%"></i></div>
+          <div class="delta">+0.2</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTION BAR -->
+  <footer class="actions">
+    <div class="left">
+      <button class="btn danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        MENYERAH
+      </button>
+      <button class="btn ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+        PAUSE
+        <span class="kbd">SPACE</span>
+      </button>
+    </div>
+
+    <div class="ctx">
+      <span>SARAN AI COACH:</span> <b>"Tutup dengan call-to-action konkret."</b>
+    </div>
+
+    <div class="right">
+      <div class="ctx" style="text-align:right">
+        <div>BICARA TERUS · 18 dtk</div>
+        <div style="color:var(--cyan)">42 KATA · 2.3/dtk</div>
+      </div>
+      <button class="btn primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>
+        KIRIM ARGUMEN
+        <span class="kbd" style="border-color:rgba(0,217,255,.4);color:#aef0ff">↵</span>
+      </button>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Particles
+  const p = document.getElementById('particles');
+  for (let i=0;i<24;i++){
+    const e = document.createElement('i');
+    e.style.left = Math.random()*100 + '%';
+    e.style.bottom = (-10 - Math.random()*30) + 'px';
+    e.style.animationDelay = (Math.random()*-14) + 's';
+    e.style.animationDuration = (10 + Math.random()*12) + 's';
+    p.appendChild(e);
+  }
+
+  // Player waveform: active
+  function buildWave(el, n=22, opp=false){
+    for (let i=0;i<n;i++) el.appendChild(document.createElement('i'));
+    const bars = el.querySelectorAll('i');
+    function tick(){
+      const t = Date.now();
+      bars.forEach((b,i)=>{
+        const base = opp ? 2 : 4;
+        const amp  = opp ? 4 : 14;
+        const speed = opp ? 360 : 180;
+        const h = base + Math.abs(Math.sin(t/speed + i*0.55)) * amp;
+        b.style.height = h.toFixed(1) + 'px';
+        b.style.opacity = opp
+          ? (0.25 + Math.abs(Math.sin(t/700 + i)) * 0.35).toFixed(2)
+          : (0.55 + Math.abs(Math.sin(t/240 + i)) * 0.45).toFixed(2);
+      });
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  buildWave(document.getElementById('waveMe'), 26, false);
+  buildWave(document.getElementById('waveOpp'), 22, true);
+
+  // Live timer countdown
+  let secs = 45;
+  const tEl = document.querySelector('.timer .center .t');
+  const ringEl = document.querySelector('.timer circle[stroke="url(#ring)"]');
+  const totalSecs = 60;
+  const circ = 515.2;
+  setInterval(()=>{
+    secs = Math.max(0, secs - 1);
+    const m = Math.floor(secs/60), s = secs%60;
+    tEl.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    const pct = secs / totalSecs;
+    ringEl.setAttribute('stroke-dashoffset', (circ * (1 - pct)).toFixed(1));
+    if (secs <= 10){
+      tEl.style.color = '#ff8aa8';
+      tEl.style.textShadow = '0 0 24px rgba(255,68,119,.6)';
+    }
+  }, 1000);
+
+  // Live word count bump
+  const quote = document.getElementById('quote');
+</script>
+</body>
+</html>

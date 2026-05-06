@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>ARENA POLITIKA — Manajemen Partai PRD</title>
+<meta name="viewport" content="width=1440" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Inter:wght@400;500;600;700&family=Fraunces:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050816;
+    --bg-2:#070b1f;
+    --panel:rgba(255,255,255,0.04);
+    --panel-2:rgba(255,255,255,0.06);
+    --line:rgba(120,170,255,0.12);
+    --line-2:rgba(120,170,255,0.22);
+    --text:#e6ecff;
+    --muted:#7d8aad;
+    --dim:#566083;
+    --cyan:#00d9ff;
+    --magenta:#ff4477;
+    --gold:#d4af37;
+    --gold-2:#ffd76a;
+    --green:#00ff88;
+    --red:#ff4d6d;
+    --yellow:#ffc24d;
+    --party-blue:#3a7dff;
+    --party-blue-2:#0a3a9c;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'Inter', system-ui, sans-serif;
+    --serif:'Fraunces', serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1000px 500px at 12% -10%, rgba(58,125,255,0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 110%, rgba(212,175,55,0.08), transparent 60%),
+      linear-gradient(180deg, #050816 0%, #04060f 100%);
+    overflow-x:auto;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(120,170,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,170,255,0.04) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  .shell{width:1440px;margin:0 auto;position:relative;z-index:2;display:flex;flex-direction:column;min-height:100vh}
+
+  /* TOPBAR (compact, reused vocabulary) */
+  .topbar{
+    height:52px;display:flex;align-items:center;gap:18px;padding:0 20px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(8,12,30,0.85), rgba(5,8,22,0.5));
+    backdrop-filter:blur(8px);
+  }
+  .logo{display:flex;align-items:center;gap:10px;padding-right:16px;border-right:1px solid var(--line)}
+  .logo-mark{
+    width:26px;height:26px;position:relative;
+    background:conic-gradient(from 220deg at 50% 60%, #0a1230 0 25%, #00d9ff 25% 50%, #0a1230 50% 75%, #ff4477 75%);
+    clip-path:polygon(50% 4%, 96% 96%, 4% 96%);
+    filter:drop-shadow(0 0 6px rgba(0,217,255,0.45));
+  }
+  .logo-text b{font-family:var(--mono);font-weight:600;letter-spacing:0.16em;font-size:12px}
+  nav.tabs{display:flex;gap:0;align-items:center;height:100%}
+  nav.tabs a{
+    padding:0 14px;height:100%;display:flex;align-items:center;
+    font-family:var(--mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--muted);text-decoration:none;cursor:pointer;position:relative;
+  }
+  nav.tabs a.active{color:var(--cyan)}
+  nav.tabs a.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  nav.tabs a:hover{color:var(--text)}
+  .top-right{margin-left:auto;display:flex;gap:12px;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:0.15em}
+  .pill{display:flex;align-items:center;gap:8px;padding:5px 10px;border:1px solid var(--line);background:var(--panel)}
+  .ldot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+
+  /* PARTY HEADER */
+  .partyhead{
+    position:relative;padding:24px 28px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(900px 280px at 12% 0%, rgba(58,125,255,.18), transparent 70%),
+      radial-gradient(700px 240px at 95% 100%, rgba(212,175,55,.12), transparent 70%),
+      linear-gradient(180deg, rgba(10,18,48,.6), rgba(5,8,22,.4));
+    overflow:hidden;
+  }
+  .partyhead::before{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+    background:linear-gradient(90deg, transparent, var(--gold) 30%, var(--party-blue) 70%, transparent);
+    opacity:.6;
+  }
+  /* Subtle heraldic background pattern */
+  .partyhead .pattern{
+    position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background-image:repeating-linear-gradient(45deg, var(--gold) 0 1px, transparent 1px 28px),
+                     repeating-linear-gradient(-45deg, var(--gold) 0 1px, transparent 1px 28px);
+  }
+  .partyhead-inner{display:flex;align-items:center;gap:26px;position:relative;z-index:2}
+
+  /* Heraldic crest logo (original geometric) */
+  .crest{
+    width:108px;height:128px;flex-shrink:0;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    filter:drop-shadow(0 0 18px rgba(58,125,255,.35));
+  }
+  .crest svg{width:100%;height:100%}
+
+  .ph-title{flex:1}
+  .ph-title .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.35em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+  .ph-title h1{
+    font-family:var(--serif);font-weight:600;font-size:32px;letter-spacing:0.005em;line-height:1.1;
+    margin-top:6px;
+    background:linear-gradient(180deg,#ffffff,#bcd1ff 130%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .ph-title h1 b{color:var(--gold);-webkit-text-fill-color:var(--gold);font-weight:600}
+  .ph-title .slogan{font-family:var(--serif);font-style:italic;font-size:14px;color:#bcd1ff;margin-top:6px;opacity:.85}
+  .ph-meta{display:flex;gap:18px;margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:0.12em;align-items:center}
+  .ph-meta .div{width:1px;height:14px;background:var(--line)}
+  .ph-meta b{color:var(--text)}
+
+  /* Tier widget */
+  .tier{
+    width:240px;flex-shrink:0;padding:14px;border:1px solid rgba(212,175,55,.4);
+    background:linear-gradient(180deg, rgba(212,175,55,.08), rgba(212,175,55,.02));
+    position:relative;
+  }
+  .tier::before, .tier::after{content:"";position:absolute;width:8px;height:8px;border:1px solid var(--gold)}
+  .tier::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .tier::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .tier .lbl{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:0.3em;text-transform:uppercase}
+  .tier .vt{font-family:var(--mono);font-size:18px;font-weight:600;color:#fff;letter-spacing:0.06em;margin-top:4px}
+  .tier .vt b{color:var(--gold)}
+  .tier .next{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:0.05em}
+  .tbar{height:6px;background:rgba(255,255,255,.06);margin-top:8px;position:relative;overflow:hidden}
+  .tbar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--gold),var(--gold-2));box-shadow:0 0 10px rgba(212,175,55,.5)}
+  .tier .req{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:6px;letter-spacing:0.12em}
+
+  /* Public opinion gauge */
+  .gauge{width:140px;height:140px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+  .gauge svg{position:absolute;inset:0}
+  .gauge .v{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--yellow);letter-spacing:0.04em;text-shadow:0 0 14px rgba(255,194,77,.4);line-height:1}
+  .gauge .v small{font-size:13px;color:var(--muted);font-weight:400}
+  .gauge .l{font-family:var(--mono);font-size:8px;letter-spacing:0.3em;color:var(--muted);text-transform:uppercase;position:absolute;bottom:14px;left:0;right:0;text-align:center}
+
+  /* MAIN GRID */
+  .main{flex:1;display:grid;grid-template-columns:320px 1fr 320px;gap:14px;padding:14px}
+
+  .card{
+    position:relative;
+    background:linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:14px;
+    backdrop-filter:blur(8px);
+  }
+  .card .corner{position:absolute;width:8px;height:8px;border:1px solid var(--cyan);opacity:.6}
+  .card .corner.tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+  .card .corner.tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+  .card .corner.bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+  .card .corner.br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+  .card:hover{border-color:var(--line-2);box-shadow:0 0 24px rgba(58,125,255,.06)}
+
+  .h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .h h3{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase}
+  .h .meta{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:0.15em;display:flex;align-items:center;gap:6px}
+
+  /* === LEFT === */
+  .left{display:flex;flex-direction:column;gap:12px}
+
+  /* Org chart */
+  .org{position:relative;padding:6px 4px}
+  .role-row{display:grid;grid-template-columns:1fr;gap:8px}
+  .role{
+    display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);
+    background:rgba(255,255,255,.02);position:relative;
+  }
+  .role.lead{border-color:rgba(212,175,55,.45);background:linear-gradient(90deg, rgba(212,175,55,.08), rgba(212,175,55,.01));box-shadow:inset 0 0 16px rgba(212,175,55,.05)}
+  .role.me{border-color:var(--cyan);background:linear-gradient(90deg, rgba(0,217,255,.1), rgba(0,217,255,.02));box-shadow:0 0 16px rgba(0,217,255,.18)}
+  .role .av{
+    width:32px;height:32px;flex-shrink:0;border-radius:3px;
+    background:linear-gradient(135deg,#1d2a5e,#0a1230);
+    border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:10.5px;color:var(--cyan);font-weight:600;letter-spacing:0.05em;
+    position:relative;
+  }
+  .role.lead .av{border-color:rgba(212,175,55,.5);color:var(--gold)}
+  .role.me .av{border-color:var(--cyan);box-shadow:0 0 10px rgba(0,217,255,.4)}
+  .role .av .stat{position:absolute;width:8px;height:8px;border-radius:50%;right:-3px;bottom:-3px;border:1.5px solid #050816}
+  .role .av .stat.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+  .role .av .stat.off{background:var(--dim)}
+  .role .av .stat.away{background:var(--yellow);box-shadow:0 0 5px var(--yellow)}
+  .role .info{flex:1;min-width:0}
+  .role .info .ti{font-family:var(--mono);font-size:9.5px;color:var(--gold);letter-spacing:0.18em;text-transform:uppercase}
+  .role.me .info .ti{color:var(--cyan)}
+  .role .info .nm{font-size:11.5px;color:var(--text);font-weight:500;margin-top:1px;letter-spacing:0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .role .badge-mini{font-family:var(--mono);font-size:8.5px;letter-spacing:0.15em;color:var(--dim);padding:2px 6px;border:1px solid var(--line);text-transform:uppercase}
+
+  .org-divider{display:flex;align-items:center;gap:8px;margin:10px 0 6px}
+  .org-divider .l{flex:1;height:1px;background:var(--line)}
+  .org-divider span{font-family:var(--mono);font-size:9px;letter-spacing:0.3em;color:var(--dim);text-transform:uppercase}
+
+  /* Compass */
+  .compass{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .compass-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:0.1em}
+  .compass-meta b{color:var(--text)}
+  .coh{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px dashed var(--line);width:100%;font-family:var(--mono);font-size:10.5px}
+  .coh .v{color:var(--green);font-size:18px;font-weight:600;letter-spacing:0.04em;text-shadow:0 0 10px rgba(0,255,136,.3)}
+
+  /* === CENTER === */
+  .center{display:flex;flex-direction:column;gap:14px}
+
+  /* Missions */
+  .miss-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .miss-head h2{font-family:var(--mono);font-size:13px;letter-spacing:0.22em;text-transform:uppercase;color:#fff;font-weight:500}
+  .miss-head h2 b{color:var(--cyan)}
+  .new-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;padding:8px 14px;border:1px solid var(--cyan);color:var(--cyan);background:rgba(0,217,255,.06);cursor:pointer}
+  .new-btn:hover{background:rgba(0,217,255,.16);box-shadow:0 0 18px rgba(0,217,255,.3)}
+
+  .missions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mission{
+    position:relative;padding:14px;border:1px solid var(--line-2);
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .mission.priority{border-color:rgba(255,77,109,.4);background:linear-gradient(180deg, rgba(255,77,109,.08), rgba(255,77,109,.01))}
+  .mission.priority::before{content:"PRIORITAS";position:absolute;top:-9px;left:12px;font-family:var(--mono);font-size:9px;letter-spacing:0.25em;color:var(--red);background:#050816;padding:1px 8px;border:1px solid rgba(255,77,109,.5)}
+  .m-meta{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+  .m-meta .tag{padding:2px 6px;border:1px solid var(--line-2);color:var(--cyan)}
+  .m-meta .tag.hukum{color:#a78bff;border-color:rgba(167,139,255,.4)}
+  .m-meta .tag.train{color:var(--gold);border-color:rgba(212,175,55,.4)}
+  .m-title{font-size:14px;font-weight:600;line-height:1.3;color:#fff;letter-spacing:0.01em}
+  .m-desc{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .m-bar{height:4px;background:rgba(255,255,255,.05);position:relative;overflow:hidden;margin-top:auto}
+  .m-bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--cyan),#4d7dff);box-shadow:0 0 10px rgba(0,217,255,.4)}
+  .mission.priority .m-bar i{background:linear-gradient(90deg,var(--magenta),var(--gold))}
+  .m-foot{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em}
+  .m-foot b{color:var(--text)}
+  .m-foot .reward{color:var(--gold);letter-spacing:0.1em}
+
+  /* Activity feed */
+  .feed{display:flex;flex-direction:column;position:relative;padding-left:18px}
+  .feed::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg, var(--cyan), transparent 90%);opacity:.5}
+  .feed .item{position:relative;padding:10px 0;border-bottom:1px dashed var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+  .feed .item:last-child{border-bottom:none}
+  .feed .item::before{
+    content:"";position:absolute;left:-17px;top:16px;width:9px;height:9px;border-radius:50%;
+    background:var(--cyan);border:2px solid #050816;box-shadow:0 0 0 1px var(--cyan), 0 0 8px var(--cyan);
+  }
+  .feed .item.gold::before{background:var(--gold);box-shadow:0 0 0 1px var(--gold), 0 0 8px var(--gold)}
+  .feed .item.green::before{background:var(--green);box-shadow:0 0 0 1px var(--green), 0 0 8px var(--green)}
+  .feed .item.magenta::before{background:var(--magenta);box-shadow:0 0 0 1px var(--magenta), 0 0 8px var(--magenta)}
+  .feed .t{font-size:12px;color:var(--text);line-height:1.4}
+  .feed .t b{color:#fff;font-weight:600}
+  .feed .t span{color:var(--cyan)}
+  .feed .ts{font-family:var(--mono);font-size:9.5px;color:var(--dim);letter-spacing:0.12em;white-space:nowrap}
+
+  /* Pemilu prep */
+  .pemilu-head{display:flex;align-items:center;gap:12px}
+  .pemilu-head .countdown{display:flex;gap:5px}
+  .cu{padding:5px 9px;border:1px solid rgba(212,175,55,.5);background:rgba(212,175,55,.06);font-family:var(--mono);text-align:center;min-width:38px}
+  .cu b{display:block;font-size:14px;color:var(--gold);letter-spacing:0.04em;text-shadow:0 0 8px rgba(212,175,55,.4);line-height:1}
+  .cu small{font-size:8px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase}
+
+  .candidates{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .cand{
+    border:1px solid var(--line-2);padding:10px;background:rgba(255,255,255,.025);
+    display:flex;flex-direction:column;gap:6px;font-family:var(--mono);position:relative;
+    cursor:pointer;transition:all .15s;
+  }
+  .cand:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(0,217,255,.18)}
+  .cand .pf{display:flex;align-items:center;gap:8px}
+  .cand .av{width:32px;height:32px;border-radius:3px;background:linear-gradient(135deg,#1d2a5e,#0a1230);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--cyan)}
+  .cand.top .av{border-color:rgba(212,175,55,.5);color:var(--gold)}
+  .cand .nm{font-size:10.5px;color:var(--text);letter-spacing:0.04em;font-weight:500;line-height:1.2}
+  .cand .nm small{display:block;color:var(--dim);font-size:8.5px;margin-top:2px;letter-spacing:0.1em}
+  .cand .stats{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);letter-spacing:0.05em}
+  .cand .elo{color:var(--cyan);font-weight:500}
+  .cand.top .elo{color:var(--gold)}
+  .cand .dapil{font-size:8.5px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;border-top:1px dashed var(--line);padding-top:5px;margin-top:auto}
+  .cand .dapil b{color:var(--text)}
+
+  .budget{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);display:grid;grid-template-columns:1fr 200px;gap:14px;align-items:center}
+  .budget .lab{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:6px}
+  .budget .lab b{color:var(--gold)}
+  .slider-track{height:6px;background:rgba(255,255,255,.06);position:relative}
+  .slider-track i{position:absolute;left:0;top:0;bottom:0;width:62%;background:linear-gradient(90deg,var(--cyan),var(--gold));box-shadow:0 0 8px rgba(212,175,55,.3)}
+  .slider-track .knob{position:absolute;left:62%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:#050816;border:2px solid var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .slider-stops{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8.5px;color:var(--dim);margin-top:6px;letter-spacing:0.1em}
+  .seats-pred{text-align:center;font-family:var(--mono)}
+  .seats-pred .nv{font-size:24px;font-weight:600;color:var(--cyan);letter-spacing:0.04em;text-shadow:0 0 12px rgba(0,217,255,.35);line-height:1}
+  .seats-pred .nv span{color:var(--muted);font-size:14px;font-weight:400}
+  .seats-pred small{font-size:8.5px;color:var(--dim);letter-spacing:0.2em;text-transform:uppercase;display:block;margin-top:4px}
+
+  /* === RIGHT === */
+  .right{display:flex;flex-direction:column;gap:12px}
+
+  /* Treasury */
+  .treas{padding:14px}
+  .treas .big{font-family:var(--mono);font-weight:600;font-size:34px;color:var(--gold);letter-spacing:0.04em;text-shadow:0 0 16px rgba(212,175,55,.4);line-height:1}
+  .treas .big small{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px;letter-spacing:0.15em}
+  .treas .sub{font-size:10.5px;color:var(--muted);margin-top:4px;letter-spacing:0.05em}
+  .ie-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .ie{padding:8px;border:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .ie .l{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase}
+  .ie .v{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:0.04em;margin-top:2px}
+  .ie .v.up{color:var(--green);text-shadow:0 0 8px rgba(0,255,136,.3)}
+  .ie .v.dn{color:var(--magenta);text-shadow:0 0 8px rgba(255,68,119,.3)}
+  .spark{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:6px}
+  .spark i{flex:1;background:linear-gradient(180deg, var(--green), rgba(0,255,136,.1));min-height:2px}
+  .spark.dn i{background:linear-gradient(180deg, var(--magenta), rgba(255,68,119,.1))}
+  .iuran{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .iuran .l{font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;display:flex;justify-content:space-between}
+  .iuran .l b{color:var(--text)}
+  .iuran .pb{height:5px;background:rgba(255,255,255,.06);margin-top:6px;position:relative}
+  .iuran .pb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--green),#a8ffd8);box-shadow:0 0 8px rgba(0,255,136,.3)}
+  .manage-btn{width:100%;margin-top:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;padding:10px;border:1px solid var(--gold);color:var(--gold);background:rgba(212,175,55,.06);cursor:pointer}
+  .manage-btn:hover{background:rgba(212,175,55,.16);box-shadow:0 0 16px rgba(212,175,55,.25)}
+
+  /* Heatmap */
+  .members .top{display:flex;justify-content:space-between;font-family:var(--mono);align-items:center}
+  .members .big{font-size:22px;font-weight:600;color:#fff;letter-spacing:0.04em}
+  .members .big span{color:var(--muted)}
+  .members .net{display:flex;gap:10px;font-size:10px;letter-spacing:0.12em}
+  .members .net .up{color:var(--green)}
+  .members .net .dn{color:var(--magenta)}
+  .heat{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;margin-top:10px}
+  .heat i{aspect-ratio:1;background:rgba(0,217,255,.06);border-radius:1px}
+  .heat i[data-l="1"]{background:rgba(0,217,255,.16)}
+  .heat i[data-l="2"]{background:rgba(0,217,255,.32)}
+  .heat i[data-l="3"]{background:rgba(0,217,255,.55);box-shadow:0 0 4px rgba(0,217,255,.3)}
+  .heat i[data-l="4"]{background:#00d9ff;box-shadow:0 0 5px rgba(0,217,255,.5)}
+  .heat-foot{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:6px;letter-spacing:0.1em}
+
+  /* Diplomatic */
+  .ally{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .ally:last-child{border-bottom:none}
+  .ally .em{
+    width:30px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    clip-path:polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    border:1px solid var(--green);background:rgba(0,255,136,.06);color:var(--green);
+  }
+  .ally.rival .em{border-color:rgba(255,77,109,.5);background:rgba(255,77,109,.06);color:var(--red)}
+  .ally.neutral .em{border-color:rgba(212,175,55,.5);background:rgba(212,175,55,.06);color:var(--gold)}
+  .ally .nm{flex:1}
+  .ally .nm b{font-family:var(--mono);font-size:11px;letter-spacing:0.05em;color:var(--text);font-weight:500;display:block}
+  .ally .nm small{font-size:9.5px;color:var(--muted);letter-spacing:0.05em}
+  .ally .st{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;padding:2px 6px;border:1px solid;text-transform:uppercase}
+  .ally .st.ally{color:var(--green);border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.05)}
+  .ally .st.rival{color:var(--red);border-color:rgba(255,77,109,.4);background:rgba(255,77,109,.05)}
+  .ally .st.neutral{color:var(--gold);border-color:rgba(212,175,55,.4);background:rgba(212,175,55,.05)}
+
+  /* Parliament */
+  .parl{display:flex;flex-direction:column;gap:9px}
+  .seat-row{display:grid;grid-template-columns:120px 1fr auto;gap:10px;align-items:center;font-family:var(--mono)}
+  .seat-row .l{font-size:10px;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase}
+  .seat-row .l b{color:var(--text);display:block;font-size:11px;letter-spacing:0.05em}
+  .pips{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+  .pips i{width:8px;height:12px;background:var(--line-2);border-radius:1px}
+  .pips i.on{background:var(--cyan);box-shadow:0 0 4px var(--cyan)}
+  .pips i.gold{background:var(--gold);box-shadow:0 0 4px var(--gold)}
+  .seat-num{font-size:14px;font-weight:600;color:var(--text);letter-spacing:0.04em}
+  .seat-num.zero{color:var(--dim)}
+  .seat-num span{font-size:10px;color:var(--muted);font-weight:400}
+  .seat-row.locked .l b{color:var(--dim)}
+
+  /* Manifesto */
+  .manifesto{padding:14px;border:1px solid var(--line);background:linear-gradient(180deg, rgba(212,175,55,.04), rgba(212,175,55,.01));position:relative}
+  .manifesto::before{content:"❝";position:absolute;left:10px;top:2px;font-family:var(--serif);font-size:42px;color:var(--gold);opacity:.5;line-height:1}
+  .manifesto h4{font-family:var(--serif);font-size:13px;color:var(--gold);letter-spacing:0.02em;margin-bottom:6px;padding-left:32px}
+  .manifesto p{font-family:var(--serif);font-style:italic;font-size:11.5px;color:#cdd5ee;line-height:1.6;padding-left:32px}
+  .manifesto .sign{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.2em;margin-top:8px;text-align:right;text-transform:uppercase}
+
+  /* Status bar */
+  .statusbar{
+    height:40px;border-top:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(5,8,22,.6), rgba(5,8,22,.95));
+    display:flex;align-items:center;padding:0 18px;gap:18px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;
+  }
+  .statusbar .grp{display:flex;align-items:center;gap:8px}
+  .statusbar .sep{width:1px;height:14px;background:var(--line)}
+  .statusbar b{color:var(--cyan);font-weight:500}
+  .statusbar .grp.gold b{color:var(--gold)}
+  .statusbar .right{margin-left:auto}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <div class="logo-text"><b>ARENA·POLITIKA</b></div>
+    </div>
+    <nav class="tabs">
+      <a><span style="font-size:9px;color:var(--dim);margin-right:6px">01</span>Arena</a>
+      <a><span style="font-size:9px;color:var(--dim);margin-right:6px">02</span>Karir</a>
+      <a class="active"><span style="font-size:9px;color:var(--dim);margin-right:6px">03</span>Partai</a>
+      <a><span style="font-size:9px;color:var(--dim);margin-right:6px">04</span>Pemilu</a>
+      <a><span style="font-size:9px;color:var(--dim);margin-right:6px">05</span>Parlemen</a>
+      <a><span style="font-size:9px;color:var(--dim);margin-right:6px">06</span>Klip</a>
+    </nav>
+    <div class="top-right">
+      <div class="pill"><span class="ldot"></span>BUDI_PKU · KETUA UMUM</div>
+      <div class="pill">PRD-DPP-RIAU</div>
+    </div>
+  </header>
+
+  <!-- PARTY HEADER -->
+  <section class="partyhead">
+    <div class="pattern"></div>
+    <div class="partyhead-inner">
+
+      <!-- CREST -->
+      <div class="crest">
+        <svg viewBox="0 0 108 128">
+          <defs>
+            <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3a7dff"/>
+              <stop offset="100%" stop-color="#0a1d52"/>
+            </linearGradient>
+            <linearGradient id="goldg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffd76a"/>
+              <stop offset="100%" stop-color="#a07e1c"/>
+            </linearGradient>
+          </defs>
+          <!-- Shield outer -->
+          <path d="M54 4 L100 16 L100 70 Q100 100 54 124 Q8 100 8 70 L8 16 Z"
+                fill="url(#shield)" stroke="url(#goldg)" stroke-width="2"/>
+          <!-- inner shield -->
+          <path d="M54 14 L92 24 L92 70 Q92 94 54 114 Q16 94 16 70 L16 24 Z"
+                fill="none" stroke="rgba(255,215,106,.45)" stroke-width="1" stroke-dasharray="3 2"/>
+          <!-- Star (5-pointed) -->
+          <path d="M54 32 L58.5 47 L74 47 L61.5 56 L66 71 L54 62 L42 71 L46.5 56 L34 47 L49.5 47 Z"
+                fill="url(#goldg)" stroke="#ffd76a" stroke-width=".6"
+                style="filter:drop-shadow(0 0 6px rgba(212,175,55,.5))"/>
+          <!-- Banner -->
+          <path d="M14 84 L94 84 L86 96 L94 108 L14 108 L22 96 Z" fill="#0a1d52" stroke="url(#goldg)" stroke-width="1.2"/>
+          <text x="54" y="100" font-family="IBM Plex Mono" font-weight="600" font-size="11" fill="#ffd76a" text-anchor="middle" letter-spacing="3">PRD</text>
+          <!-- Laurels (geometric) -->
+          <g stroke="rgba(255,215,106,.5)" stroke-width=".8" fill="none">
+            <path d="M22 60 Q16 52 22 44 Q18 40 24 36"/>
+            <path d="M86 60 Q92 52 86 44 Q90 40 84 36"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- TITLE -->
+      <div class="ph-title">
+        <div class="eyebrow"><span style="color:var(--gold)">◆</span> KARTU IDENTITAS PARTAI · DPP <span style="opacity:.6">·</span> SISTEM REPUBLIK ONLINE</div>
+        <h1>PRD <span style="color:#bcd1ff;-webkit-text-fill-color:#bcd1ff;font-weight:500">·</span> Partai Reformasi <b>Demokrasi</b></h1>
+        <div class="slogan">"Merawat Akal Sehat, Membangun Negeri."</div>
+        <div class="ph-meta">
+          <span>DIDIRIKAN <b>12 JANUARI 2026</b></span>
+          <span class="div"></span>
+          <span>NO. REGISTRASI <b>DPP-PRD-04127</b></span>
+          <span class="div"></span>
+          <span>PUSAT <b>JAKARTA · DPP</b></span>
+          <span class="div"></span>
+          <span>CABANG <b>14 DPC · 47 RANTING</b></span>
+        </div>
+      </div>
+
+      <!-- TIER -->
+      <div class="tier">
+        <div class="lbl">◇ TIER PARTAI</div>
+        <div class="vt">T2 <b>· PARTAI LOKAL</b></div>
+        <div class="next">Progress menuju T3 — Partai Regional</div>
+        <div class="tbar"><i style="width:73.5%"></i></div>
+        <div class="req"><span>147 / 200 ANGGOTA</span><span>73.5%</span></div>
+        <div class="req" style="margin-top:3px"><span>11 / 15 KURSI</span><span>73%</span></div>
+      </div>
+
+      <!-- GAUGE -->
+      <div class="gauge">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <!-- Track arc 240deg -->
+          <path d="M30,110 A56,56 0 1,1 110,110" fill="none" stroke="rgba(120,170,255,.15)" stroke-width="8" stroke-linecap="round"/>
+          <!-- Progress 67% of 240deg -->
+          <path d="M30,110 A56,56 0 1,1 110,110" fill="none" stroke="url(#gaugeg)" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="234.6" stroke-dashoffset="77.4"
+                style="filter:drop-shadow(0 0 8px rgba(255,194,77,.5))"/>
+          <defs>
+            <linearGradient id="gaugeg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ff4477"/>
+              <stop offset="50%" stop-color="#ffc24d"/>
+              <stop offset="100%" stop-color="#00ff88"/>
+            </linearGradient>
+          </defs>
+          <!-- ticks -->
+          <g stroke="rgba(120,170,255,.3)" stroke-width="1">
+            <line x1="70" y1="14" x2="70" y2="22"/>
+          </g>
+        </svg>
+        <div style="text-align:center">
+          <div class="v">67<small>/100</small></div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--yellow);margin-top:2px">OPINI PUBLIK</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- LEFT -->
+    <aside class="left">
+
+      <!-- LEADERSHIP -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Struktur Pimpinan · DPP</h3><span class="meta">PERIODE 2026·31</span></div>
+
+        <div class="org">
+          <div class="role-row">
+            <div class="role lead me">
+              <div class="av">BP<span class="stat on"></span></div>
+              <div class="info">
+                <div class="ti">Ketua Umum</div>
+                <div class="nm">Budi Pratama (Anda)</div>
+              </div>
+              <div class="badge-mini">★</div>
+            </div>
+          </div>
+
+          <div class="org-divider"><div class="l"></div><span>Pengurus Harian</span><div class="l"></div></div>
+
+          <div class="role-row">
+            <div class="role lead">
+              <div class="av">SR<span class="stat on"></span></div>
+              <div class="info"><div class="ti">Sekretaris Jenderal</div><div class="nm">Sari Wulandari</div></div>
+            </div>
+            <div class="role lead">
+              <div class="av">AN<span class="stat on"></span></div>
+              <div class="info"><div class="ti">Bendahara Umum</div><div class="nm">Andi Nugraha</div></div>
+            </div>
+          </div>
+
+          <div class="org-divider"><div class="l"></div><span>Ketua Bidang</span><div class="l"></div></div>
+
+          <div class="role-row">
+            <div class="role">
+              <div class="av">MR<span class="stat on"></span></div>
+              <div class="info"><div class="ti">Bidang Politik</div><div class="nm">M. Ridwan</div></div>
+            </div>
+            <div class="role">
+              <div class="av">DA<span class="stat away"></span></div>
+              <div class="info"><div class="ti">Bidang Ekonomi</div><div class="nm">Dewi Anjani</div></div>
+            </div>
+            <div class="role">
+              <div class="av">YT<span class="stat on"></span></div>
+              <div class="info"><div class="ti">Bidang Sosial</div><div class="nm">Yusuf Tanjung</div></div>
+            </div>
+            <div class="role">
+              <div class="av">FH<span class="stat off"></span></div>
+              <div class="info"><div class="ti">Bidang Hukum</div><div class="nm">Fitri Hadiwijaya</div></div>
+            </div>
+            <div class="role">
+              <div class="av">RA<span class="stat on"></span></div>
+              <div class="info"><div class="ti">Bidang Media</div><div class="nm">Raka Adiwangsa</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IDEOLOGY -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Keselarasan Ideologi</h3><span class="meta">COMPASS v2.3</span></div>
+        <div class="compass">
+          <svg width="220" height="200" viewBox="0 0 220 200">
+            <g fill="none" stroke="rgba(120,170,255,0.18)" stroke-width="0.8">
+              <polygon points="110,20 190,55 190,145 110,180 30,145 30,55"/>
+              <polygon points="110,45 165,68 165,132 110,155 55,132 55,68"/>
+              <polygon points="110,70 140,82 140,118 110,130 80,118 80,82"/>
+            </g>
+            <g stroke="rgba(120,170,255,0.18)" stroke-width="0.5">
+              <line x1="110" y1="20" x2="110" y2="180"/>
+              <line x1="30" y1="55" x2="190" y2="145"/>
+              <line x1="190" y1="55" x2="30" y2="145"/>
+            </g>
+            <!-- Member dot cluster -->
+            <g fill="rgba(0,217,255,.7)">
+              <circle cx="118" cy="60" r="2"/><circle cx="125" cy="68" r="2"/><circle cx="130" cy="78" r="2"/>
+              <circle cx="135" cy="88" r="2"/><circle cx="142" cy="92" r="2"/><circle cx="138" cy="100" r="2"/>
+              <circle cx="128" cy="105" r="2"/><circle cx="120" cy="100" r="2"/><circle cx="115" cy="92" r="2"/>
+              <circle cx="108" cy="86" r="2"/><circle cx="100" cy="80" r="2"/><circle cx="105" cy="70" r="2"/>
+              <circle cx="148" cy="86" r="2"/><circle cx="124" cy="115" r="2"/><circle cx="118" cy="78" r="2"/>
+              <circle cx="135" cy="115" r="2"/><circle cx="115" cy="105" r="2"/><circle cx="112" cy="78" r="2"/>
+            </g>
+            <!-- Party position fill -->
+            <polygon points="110,38 158,72 152,128 110,148 68,130 78,72"
+                     fill="rgba(212,175,55,.18)" stroke="#d4af37" stroke-width="1.4"
+                     style="filter:drop-shadow(0 0 8px rgba(212,175,55,.4))"/>
+            <g fill="#d4af37">
+              <circle cx="110" cy="38" r="2"/><circle cx="158" cy="72" r="2"/><circle cx="152" cy="128" r="2"/>
+              <circle cx="110" cy="148" r="2"/><circle cx="68" cy="130" r="2"/><circle cx="78" cy="72" r="2"/>
+            </g>
+            <g font-family="IBM Plex Mono" font-size="8" fill="#7d8aad" text-anchor="middle" letter-spacing="0.5">
+              <text x="110" y="14">PROGRESIF</text>
+              <text x="200" y="55">REFORMIS</text>
+              <text x="200" y="151">PRAGMATIS</text>
+              <text x="110" y="195">KONSERVATIF</text>
+              <text x="20" y="151">POPULIS</text>
+              <text x="20" y="55">TEKNOKRAT</text>
+            </g>
+          </svg>
+          <div class="compass-meta">
+            <div><span>Tipe Partai</span></div><div><b style="color:var(--gold)">Pragmatic Reformis</b></div>
+            <div><span>Distribusi Kader</span></div><div><b>147 anggota</b></div>
+            <div><span>Sebaran (σ)</span></div><div><b>0.18</b></div>
+            <div><span>Drift mingguan</span></div><div><b style="color:var(--cyan)">+0.04 ↗</b></div>
+          </div>
+          <div class="coh">
+            <span style="color:var(--muted);letter-spacing:0.18em">SKOR KOHERENSI</span>
+            <span class="v">78<span style="font-size:11px;color:var(--muted);font-weight:400">%</span></span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER -->
+    <section class="center">
+
+      <!-- MISSIONS -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="miss-head">
+          <h2>◇ MISI INTERNAL <b>AKTIF</b></h2>
+          <button class="new-btn">＋ BUAT MISI BARU</button>
+        </div>
+        <div class="missions">
+
+          <div class="mission priority">
+            <div class="m-meta"><span class="tag">KAMPANYE · DPRD</span><span>5 HARI LAGI</span></div>
+            <div class="m-title">Kampanye DPRD Riau — Rekrut 20 Caleg Potensial</div>
+            <div class="m-desc">Identifikasi kader berbasis akar rumput dengan ELO ≥ 1100 untuk dapil Riau-1 sampai Riau-4.</div>
+            <div class="m-bar"><i style="width:65%"></i></div>
+            <div class="m-foot"><b>13 / 20 caleg</b><span class="reward">+5,000 KOIN · +TIER PROGRESS</span></div>
+          </div>
+
+          <div class="mission">
+            <div class="m-meta"><span class="tag hukum">KEBIJAKAN · HUKUM</span><span>BERLANGSUNG</span></div>
+            <div class="m-title">Policy Paper Reformasi Hukum</div>
+            <div class="m-desc">Tim Bidang Hukum menyusun naskah akademik untuk RUU Reformasi Peradilan.</div>
+            <div class="m-bar"><i style="width:42%"></i></div>
+            <div class="m-foot"><b>Tim Hukum · 7 kontributor</b><span class="reward">+2,000 KOIN · +OPINI 5</span></div>
+          </div>
+
+          <div class="mission">
+            <div class="m-meta"><span class="tag train">PELATIHAN · KADER</span><span>WAJIB</span></div>
+            <div class="m-title">Debate Training — Semua Kader</div>
+            <div class="m-desc">Modul Oxford-style + simulasi AI Coach untuk kader baru sebelum pemilu.</div>
+            <div class="m-bar"><i style="width:50.5%"></i></div>
+            <div class="m-foot"><b>45 / 89 kader</b><span class="reward">+50 ELO RATA · +KOHERENSI 3</span></div>
+          </div>
+
+          <div class="mission">
+            <div class="m-meta"><span class="tag">DIPLOMASI</span><span>2 HARI LAGI</span></div>
+            <div class="m-title">Negosiasi Koalisi Energi Hijau</div>
+            <div class="m-desc">Aliansi taktis dengan PNB untuk mendukung RUU Energi Terbarukan di parlemen.</div>
+            <div class="m-bar"><i style="width:80%"></i></div>
+            <div class="m-foot"><b>Bidang Politik</b><span class="reward">+8 KURSI ALLY · OPINI +6</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ACTIVITY FEED -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Kronik Aktivitas Partai</h3><span class="meta"><span class="ldot"></span>LIVE FEED · 7 HARI</span></div>
+        <div class="feed">
+          <div class="item">
+            <div class="t"><b>Andi Pratama</b> bergabung sebagai Kader Bidang Sosial · dapil <span>Riau-2</span></div>
+            <div class="ts">2j</div>
+          </div>
+          <div class="item green">
+            <div class="t"><b>Sari Wulandari</b> menang debat melawan <span>Si Birokrat</span> &nbsp;<b style="color:var(--green)">+45 ELO</b></div>
+            <div class="ts">5j</div>
+          </div>
+          <div class="item gold">
+            <div class="t">Kader PRD mengajukan <b>RUU Reformasi Subsidi</b> di Komisi XI · ditandatangani 8 anggota</div>
+            <div class="ts">8j</div>
+          </div>
+          <div class="item magenta">
+            <div class="t"><b>Vira Damayanti</b> menerima tantangan dari <span style="color:var(--magenta)">Partai GIK</span> · debat publik dijadwalkan Kamis</div>
+            <div class="ts">14j</div>
+          </div>
+          <div class="item">
+            <div class="t">Kongres Internal · voting <b>Ketua Bidang Ekonomi</b> dimulai · 89 / 147 sudah memilih</div>
+            <div class="ts">2h</div>
+          </div>
+          <div class="item gold">
+            <div class="t"><b>Pencapaian Partai:</b> <span>"Suara Akar Rumput"</span> — 50 debat regional dimenangkan kader · <b style="color:var(--gold)">+2,500 KAS</b></div>
+            <div class="ts">3h</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PEMILU PREP -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h">
+          <div class="pemilu-head">
+            <h3 style="color:#fff;font-size:11.5px">◆ PEMILU DPRD PROVINSI · Riau</h3>
+          </div>
+          <div class="pemilu-head">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:0.18em">14 HARI</span>
+            <div class="countdown">
+              <div class="cu"><b>14</b><small>HR</small></div>
+              <div class="cu"><b>06</b><small>JM</small></div>
+              <div class="cu"><b>23</b><small>MN</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="candidates">
+          <div class="cand top">
+            <div class="pf"><div class="av">SW</div><div class="nm">Sari W.<small>SEKJEN</small></div></div>
+            <div class="stats"><span>ELO</span><span class="elo">1,892</span></div>
+            <div class="dapil">DAPIL <b>RIAU-1</b></div>
+          </div>
+          <div class="cand">
+            <div class="pf"><div class="av">MR</div><div class="nm">M. Ridwan<small>BID. POLITIK</small></div></div>
+            <div class="stats"><span>ELO</span><span class="elo">1,704</span></div>
+            <div class="dapil">DAPIL <b>RIAU-2</b></div>
+          </div>
+          <div class="cand">
+            <div class="pf"><div class="av">DA</div><div class="nm">Dewi A.<small>BID. EKONOMI</small></div></div>
+            <div class="stats"><span>ELO</span><span class="elo">1,612</span></div>
+            <div class="dapil">DAPIL <b>RIAU-3</b></div>
+          </div>
+          <div class="cand">
+            <div class="pf"><div class="av">YT</div><div class="nm">Yusuf T.<small>BID. SOSIAL</small></div></div>
+            <div class="stats"><span>ELO</span><span class="elo">1,489</span></div>
+            <div class="dapil">DAPIL <b>RIAU-4</b></div>
+          </div>
+          <div class="cand">
+            <div class="pf"><div class="av">RA</div><div class="nm">Raka A.<small>BID. MEDIA</small></div></div>
+            <div class="stats"><span>ELO</span><span class="elo">1,358</span></div>
+            <div class="dapil">DAPIL <b>RIAU-1</b></div>
+          </div>
+        </div>
+
+        <div class="budget">
+          <div>
+            <div class="lab"><span>Alokasi Anggaran Kampanye</span><b>⬢ 18,500 / 30,000</b></div>
+            <div class="slider-track"><i></i><div class="knob"></div></div>
+            <div class="slider-stops"><span>HEMAT</span><span>SEIMBANG</span><span>AGRESIF</span></div>
+            <div class="lab" style="margin-top:14px"><span>Distribusi · Iklan / Lapangan / Konten</span><b style="color:var(--cyan)">42% / 33% / 25%</b></div>
+          </div>
+          <div class="seats-pred">
+            <div class="nv">3<span>–5</span></div>
+            <small>Prediksi Kursi · 50</small>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--green);margin-top:6px;letter-spacing:0.15em">CONFIDENCE 72%</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="right">
+
+      <!-- TREASURY -->
+      <div class="card treas">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Kas Partai</h3><span class="meta">DPP · KOIN POLITIK</span></div>
+        <div class="big">⬢ 45,800<small>KOIN</small></div>
+        <div class="sub">Per 06 Mei 2026 · 14:32 WIB</div>
+
+        <div class="ie-grid">
+          <div class="ie">
+            <div class="l">PEMASUKAN · 7H</div>
+            <div class="v up">+12,450</div>
+            <div class="spark">
+              <i style="height:30%"></i><i style="height:55%"></i><i style="height:42%"></i><i style="height:68%"></i><i style="height:48%"></i><i style="height:78%"></i><i style="height:90%"></i>
+            </div>
+          </div>
+          <div class="ie">
+            <div class="l">PENGELUARAN · 7H</div>
+            <div class="v dn">−8,200</div>
+            <div class="spark dn">
+              <i style="height:55%"></i><i style="height:38%"></i><i style="height:62%"></i><i style="height:30%"></i><i style="height:75%"></i><i style="height:50%"></i><i style="height:42%"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="iuran">
+          <div class="l"><span>Iuran Anggota Minggu Ini</span><b>134 / 147</b></div>
+          <div class="pb"><i style="width:91.1%"></i></div>
+        </div>
+        <button class="manage-btn">⬢ KELOLA KEUANGAN</button>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="card members">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Statistik Anggota</h3><span class="meta">30 HARI</span></div>
+        <div class="top">
+          <div class="big">147<span> / 200 AKTIF</span></div>
+          <div class="net"><span class="up">+12 ↗</span><span class="dn">−3 ↘</span></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:0.12em">
+          ONLINE SEKARANG <b style="color:var(--green)">23</b> · ALL-TIME PEAK <b style="color:var(--text)">52</b>
+        </div>
+        <div class="heat" id="heat"></div>
+        <div class="heat-foot"><span>30 HR LALU</span><span>↑ HARI INI</span></div>
+      </div>
+
+      <!-- DIPLOMATIC -->
+      <div class="card">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Aliansi &amp; Rivalitas</h3><span class="meta">DIPLOMASI</span></div>
+        <div class="ally">
+          <div class="em">PNB</div>
+          <div class="nm"><b>PNB · Nasional Berdikari</b><small>Aliansi Energi Hijau · 89 anggota</small></div>
+          <div class="st ally">SEKUTU</div>
+        </div>
+        <div class="ally neutral">
+          <div class="em">PHD</div>
+          <div class="nm"><b>PHD · Harapan Daerah</b><small>Aliansi Pendidikan · 124 anggota</small></div>
+          <div class="st neutral">MITRA</div>
+        </div>
+        <div class="ally rival">
+          <div class="em">GIK</div>
+          <div class="nm"><b>GIK · Garis Independen Konservatif</b><small>Pemilu DPRD JABAR-7 · 312 anggota</small></div>
+          <div class="st rival">RIVAL</div>
+        </div>
+        <button class="manage-btn" style="border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,.06)">⌬ AULA DIPLOMASI</button>
+      </div>
+
+      <!-- PARLIAMENT -->
+      <div class="card parl">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <div class="h"><h3>Wakil di Parlemen</h3><span class="meta">11 KURSI</span></div>
+
+        <div class="seat-row">
+          <div class="l"><b>DPRD Kabupaten</b>14 daerah</div>
+          <div class="pips">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <div class="seat-num">8 <span>/ 32</span></div>
+        </div>
+
+        <div class="seat-row">
+          <div class="l"><b>DPRD Provinsi</b>Riau</div>
+          <div class="pips">
+            <i class="gold"></i><i class="gold"></i><i class="gold"></i>
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="seat-num">3 <span>/ 50</span></div>
+        </div>
+
+        <div class="seat-row locked">
+          <div class="l"><b>DPR RI</b>Pusat</div>
+          <div class="pips">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="seat-num zero">0 <span>/ T3 ↑</span></div>
+        </div>
+
+        <div style="margin-top:12px;padding:10px;border:1px dashed var(--line);font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-align:center">
+          BUKA <b style="color:var(--gold)">DPR RI</b> DENGAN NAIK KE <b style="color:var(--gold)">TIER 3</b>
+        </div>
+      </div>
+
+      <!-- MANIFESTO -->
+      <div class="manifesto">
+        <h4>Cuplikan Manifesto</h4>
+        <p>
+          Reformasi bukan slogan; ia adalah disiplin sehari-hari. Kami percaya
+          bahwa kebijakan yang baik lahir dari data yang jujur, perdebatan yang
+          terbuka, dan keberanian untuk salah di depan publik.
+        </p>
+        <div class="sign">— Pasal 1, Manifesto PRD 2026</div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- STATUS BAR -->
+  <footer class="statusbar">
+    <div class="grp"><span class="ldot"></span>NEURAL ENGINE <b>ONLINE</b></div>
+    <div class="sep"></div>
+    <div class="grp">DPP-PRD · NODE <b>JKT-04</b></div>
+    <div class="sep"></div>
+    <div class="grp gold">MUSIM POLITIK <b>V</b> · MINGGU <b>8/12</b></div>
+    <div class="sep"></div>
+    <div class="grp">14 HARI MENUJU <b>PEMILU DPRD RIAU</b></div>
+    <div class="right">v1.4.2-ID</div>
+  </footer>
+
+</div>
+
+<script>
+  // Heatmap
+  const heat = document.getElementById('heat');
+  const today = 9; // recent column index
+  for (let r=0;r<6;r++){
+    for (let c=0;c<15;c++){
+      const i = document.createElement('i');
+      // weight more towards right half (recent = busier)
+      const recency = c/14;
+      let p = Math.random() * (0.4 + recency * 0.7);
+      let l = 0;
+      if (p > 0.30) l = 1;
+      if (p > 0.55) l = 2;
+      if (p > 0.78) l = 3;
+      if (p > 0.92) l = 4;
+      if (l) i.dataset.l = l;
+      heat.appendChild(i);
+    }
+  }
+
+  // Tabs hover
+  document.querySelectorAll('nav.tabs a').forEach(a=>{
+    a.addEventListener('click',(e)=>{
+      e.preventDefault();
+      document.querySelectorAll('nav.tabs a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
